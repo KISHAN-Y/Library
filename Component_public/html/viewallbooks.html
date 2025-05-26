@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="bookstoreApp">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,12 @@
         body {
             background-color: #f8f9fa;
         }
+
         .book-eye-cover {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease;
         }
+
         .nav-icon {
             font-size: 1.5rem;
             color: #333;
@@ -22,18 +25,22 @@
         .logo {
             max-width: 100px;
         }
+
         .card:hover .book-eye-cover {
             transform: scale(1.05);
         }
+
         .card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: none;
             overflow: hidden;
         }
+
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(228, 164, 69, 0.463) !important;
         }
+
         .section-heading {
             font-size: 2.5rem;
             font-weight: 700;
@@ -43,6 +50,7 @@
             display: inline-block;
             padding-bottom: 10px;
         }
+
         .section-heading:after {
             content: '';
             position: absolute;
@@ -53,68 +61,138 @@
             height: 3px;
             background-color: #ffcc00;
         }
+
         .genre-filter {
             display: flex;
             justify-content: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
         }
+
         .genre-btn {
-            margin: 0.25rem;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            border: 1px solid #ddd;
+            margin: 0.2rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            border: none;
             background-color: white;
             color: #333;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .genre-btn:hover, .genre-btn.active {
-            background-color: #ffcc00;
-            color: #333;
-            border-color: #ffcc00;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+        .genre-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 204, 0, 0.1) 0%, rgba(255, 204, 0, 0.3) 100%);
+            transition: width 0.4s ease;
+            z-index: -1;
         }
+
+        .genre-btn:hover::before {
+            width: 100%;
+        }
+
+        .genre-btn:hover {
+            transform: translateY(-3px);
+            color: #111;
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+        }
+
+        .genre-btn.active {
+            background: linear-gradient(135deg, #ffcc00 0%, #ffa500 100%);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
+            transform: translateY(-2px);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .genre-btn.active::before {
+            width: 0;
+        }
+
+        /* Genre-specific colors */
+        .genre-btn[ng-click*="Fantasy"] { border-left: 3px solid #9c27b0; }
+        .genre-btn[ng-click*="Romance"] { border-left: 3px solid #e91e63; }
+        .genre-btn[ng-click*="Thriller"] { border-left: 3px solid #f44336; }
+        .genre-btn[ng-click*="Mystery"] { border-left: 3px solid #673ab7; }
+        .genre-btn[ng-click*="Young Adult"] { border-left: 3px solid #2196f3; }
+        .genre-btn[ng-click*="Science Fiction"] { border-left: 3px solid #00bcd4; }
+        .genre-btn[ng-click*="Self-help"] { border-left: 3px solid #4caf50; }
+        .genre-btn[ng-click*="Dystopian"] { border-left: 3px solid #607d8b; }
+        .genre-btn[ng-click*="Contemporary"] { border-left: 3px solid #ff9800; }
+        .genre-btn[ng-click*="Horror"] { border-left: 3px solid #000000; }
+
         .search-box {
             max-width: 500px;
             margin: 0 auto 2rem;
         }
+
         .search-box .input-group {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             border-radius: 30px;
             overflow: hidden;
         }
+
         .search-box .form-control {
             border-radius: 30px 0 0 30px;
             padding: 12px 20px;
             border: none;
         }
+
         .search-box .btn {
             border-radius: 0 30px 30px 0;
             padding: 12px 20px;
         }
+
         .search-box .form-control:focus {
             box-shadow: none;
             border-color: #ffcc00;
         }
+
         .card-body {
             padding: 1.5rem;
         }
+
         .book-image {
             background-color: #f9f9f9;
             padding: 1rem !important;
             border-radius: 5px 5px 0 0;
         }
+
         .book-cover {
             transition: transform 0.5s ease;
         }
+
         .card:hover .book-cover {
             transform: scale(1.05);
         }
+
         .pricing .fw-bold {
             color: #e63946;
             font-size: 1.1rem;
         }
+
         .add-button {
             border-radius: 50%;
             width: 40px;
@@ -125,9 +203,11 @@
             align-items: center;
             transition: all 0.3s ease;
         }
+
         .add-button:hover {
             transform: scale(1.1);
         }
+
         .back-button {
             display: inline-flex;
             align-items: center;
@@ -140,36 +220,42 @@
             transition: all 0.3s ease;
             margin-top: 2rem;
         }
+
         .back-button:hover {
             background-color: #ffcc00;
             color: #1a1a1a;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
         }
+
         .page-header {
             background-color: white;
             padding: 2rem 0;
             margin-bottom: 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
+
         footer {
             background-color: #f8f9fa;
             padding: 2rem 0;
             margin-top: 3rem;
             border-top: 1px solid #eee;
         }
+
         .logo {
             max-width: 100px;
         }
+
         .no-results {
             text-align: center;
             padding: 3rem;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
+
 <body ng-controller="BookController">
 
     <!-- Navigation from INDEX.HTML -->
@@ -225,7 +311,7 @@
     <div class="page-header">
         <div class="container">
             <h1 class="section-heading text-center mb-4">All Books</h1>
-            
+
             <!-- Search Box -->
             <div class="search-box">
                 <div class="input-group">
@@ -235,15 +321,30 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Genre Filter Buttons -->
             <div class="genre-filter">
                 <button class="genre-btn" ng-class="{'active': filterGenre === ''}" ng-click="filterGenre = ''">All</button>
-                <button class="genre-btn" ng-class="{'active': filterGenre === 'Fiction'}" ng-click="filterGenre = 'Fiction'">Fiction</button>
-                <button class="genre-btn" ng-class="{'active': filterGenre === 'Non-Fiction'}" ng-click="filterGenre = 'Non-Fiction'">Non-Fiction</button>
-                <button class="genre-btn" ng-class="{'active': filterGenre === 'Biography'}" ng-click="filterGenre = 'Biography'">Biography</button>
-                <button class="genre-btn" ng-class="{'active': filterGenre === 'Mystery'}" ng-click="filterGenre = 'Mystery'">Mystery</button>
-                <button class="genre-btn" ng-class="{'active': filterGenre === 'Sci-Fi'}" ng-click="filterGenre = 'Sci-Fi'">Sci-Fi</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Fantasy'}"
+                    ng-click="filterGenre = 'Fantasy'">Fantasy</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Romance'}"
+                    ng-click="filterGenre = 'Romance'">Romance</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Thriller'}"
+                    ng-click="filterGenre = 'Thriller'">Thriller</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Mystery'}"
+                    ng-click="filterGenre = 'Mystery'">Mystery</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Young Adult'}"
+                    ng-click="filterGenre = 'Young Adult'">Young Adult</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Science Fiction'}"
+                    ng-click="filterGenre = 'Science Fiction'">Science Fiction</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Self-help'}"
+                    ng-click="filterGenre = 'Self-help'">Self-help</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Dystopian'}"
+                    ng-click="filterGenre = 'Dystopian'">Dystopian</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Contemporary'}"
+                    ng-click="filterGenre = 'Contemporary'">Contemporary</button>
+                <button class="genre-btn" ng-class="{'active': filterGenre === 'Horror'}"
+                    ng-click="filterGenre = 'Horror'">Horror</button>
             </div>
         </div>
     </div>
@@ -251,11 +352,11 @@
     <div class="container">
         <!-- Books Grid -->
         <div class="row gy-4" ng-if="(books | filter:searchQuery | filter:{genre: filterGenre}).length > 0">
-            <div class="col-6 col-md-4 col-lg-3" ng-repeat="book in books | filter:searchQuery | filter:{genre: filterGenre}">
+            <div class="col-6 col-md-4 col-lg-3"
+                ng-repeat="book in books | filter:searchQuery | filter:{genre: filterGenre}">
                 <div class="card h-100 shadow-sm">
                     <div class="book-image text-center">
-                        <img src="{{book.coverImage}}" alt="{{book.title}}" 
-                            class="img-fluid book-cover" 
+                        <img ng-src="/{{book.coverImage}}" alt="{{book.title}}" class="img-fluid book-cover"
                             style="height: 200px; object-fit: contain;"
                             onerror="this.src='images/' + ((book.id % 6) + 1) + '.png'">
                     </div>
@@ -268,7 +369,8 @@
                         <div class="d-flex justify-content-between align-items-center mt-auto">
                             <div class="pricing">
                                 <span class="fw-bold">$ {{book.price}}</span>
-                                <span class="text-decoration-line-through text-muted ms-2">$ {{book.originalPrice}}</span>
+                                <span class="text-decoration-line-through text-muted ms-2">$
+                                    {{book.originalPrice}}</span>
                             </div>
                             <button class="btn btn-warning add-button" ng-click="addToCart(book)">
                                 <i class="fas fa-shopping-cart"></i>
@@ -278,15 +380,16 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- No Results Message -->
         <div class="no-results" ng-if="(books | filter:searchQuery | filter:{genre: filterGenre}).length === 0">
             <i class="fas fa-search fa-3x text-muted mb-3"></i>
             <h3>No books found</h3>
             <p class="text-muted">We couldn't find any books that match your search criteria.</p>
-            <button class="btn btn-warning px-4 mt-2" ng-click="filterGenre = ''; searchQuery = ''">Clear filters</button>
+            <button class="btn btn-warning px-4 mt-2" ng-click="filterGenre = ''; searchQuery = ''">Clear
+                filters</button>
         </div>
-        
+
         <!-- Back to Home Button -->
         <div class="text-center mt-4">
             <a href="/" class="back-button">
@@ -335,10 +438,14 @@
                         <div class="col-md-3 mb-3 mb-md-0">
                             <h5 class="fw-bold mb-3">Follow Us</h5>
                             <div class="d-flex">
-                                <a href="#" class="text-decoration-none text-muted me-3"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="text-decoration-none text-muted me-3"><i class="fab fa-twitter"></i></a>
-                                <a href="#" class="text-decoration-none text-muted me-3"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="text-decoration-none text-muted"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="text-decoration-none text-muted me-3"><i
+                                        class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="text-decoration-none text-muted me-3"><i
+                                        class="fab fa-twitter"></i></a>
+                                <a href="#" class="text-decoration-none text-muted me-3"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a href="#" class="text-decoration-none text-muted"><i
+                                        class="fab fa-linkedin-in"></i></a>
                             </div>
                         </div>
                     </div>
@@ -367,10 +474,10 @@
 
     <script>
         // Ensure Bootstrap is properly initialized
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Highlight the active genre on click
             document.querySelectorAll('.genre-btn').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     document.querySelectorAll('.genre-btn').forEach(btn => {
                         btn.classList.remove('active');
                     });
@@ -381,7 +488,7 @@
             // Fix image loading issues
             function handleBookImages() {
                 const bookImages = document.querySelectorAll('.book-cover');
-                
+
                 bookImages.forEach(img => {
                     // Check if Angular has bound the image
                     if (img.src.includes('{{book.coverImage}}')) {
@@ -389,19 +496,19 @@
                         setTimeout(handleBookImages, 200);
                         return;
                     }
-                    
+
                     // If already loaded successfully, do nothing
                     if (img.complete && img.naturalHeight !== 0) {
                         return;
                     }
-                    
+
                     // For images that failed to load
-                    img.addEventListener('error', function(e) {
+                    img.addEventListener('error', function (e) {
                         console.log('Image failed to load:', e.target.src);
                         // Prevent flickering by setting only once
                         if (!e.target.hasAttribute('data-tried-fallback')) {
                             e.target.setAttribute('data-tried-fallback', 'true');
-                            
+
                             // Get closest parent with Angular book data to extract ID
                             const cardElement = e.target.closest('.col-6');
                             if (cardElement) {
@@ -425,15 +532,15 @@
                     });
                 });
             }
-            
+
             // Run initially after a small delay to let Angular render
             setTimeout(handleBookImages, 500);
-            
+
             // Re-run after any Angular digest cycle might have changed the DOM
-            const observer = new MutationObserver(function(mutations) {
+            const observer = new MutationObserver(function (mutations) {
                 handleBookImages();
             });
-            
+
             observer.observe(document.body, {
                 childList: true,
                 subtree: true
@@ -441,4 +548,5 @@
         });
     </script>
 </body>
-</html> 
+
+</html>

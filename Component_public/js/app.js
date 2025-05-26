@@ -1,5 +1,33 @@
 var app = angular.module("bookstoreApp", []);
 
+// File upload directive
+app.directive('fileModel', ['$parse', function($parse) {
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+      var model = $parse(attrs.fileModel);
+      var modelSetter = model.assign;
+      
+      element.bind('change', function() {
+        scope.$apply(function() {
+          modelSetter(scope, element[0].files[0]);
+          
+          // Create image preview
+          if (element[0].files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              scope.$apply(function() {
+                scope.imagePreview = e.target.result;
+              });
+            };
+            reader.readAsDataURL(element[0].files[0]);
+          }
+        });
+      });
+    }
+  };
+}]);
+
 const defaultBooks = [
   {
     id: 1001,
@@ -108,7 +136,12 @@ const defaultBooks = [
   },
 ];
 
-app.controller("BookController", function ($scope, $window) {
+app.controller("BookController", function ($scope, $window, $http) {
+
+  $scope.books = [];
+  $scope.book = {};
+  $scope.searchQuery = '';
+  $scope.filterGenre = '';
 
   $scope.currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
@@ -118,16 +151,47 @@ app.controller("BookController", function ($scope, $window) {
     $window.location.href = "/";
   };
 
-  const storedBooks = JSON.parse(localStorage.getItem("books")) || [];
-  $scope.books = defaultBooks.concat(storedBooks);
   $scope.cart = JSON.parse(localStorage.getItem("cart")) || [];
+  
+  // Fetch books from the API
+  $scope.loadBooks = function() {
+    $http.get('/api/books')
+      .then(function(response) {
+        if (response.data.success) {
+          $scope.books = response.data.books;
+          console.log('Books loaded from MongoDB:', $scope.books.length);
+        }
+      })
+      .catch(function(error) {
+        console.error('Error fetching books:', error);
+        // Fallback to localStorage if API fails
+        const storedBooks = JSON.parse(localStorage.getItem("books")) || [];
+        $scope.books = defaultBooks.concat(storedBooks);
+      });
+  };
+  
+  // Load books when controller initializes
+  $scope.loadBooks();
 
   $scope.deleteBook = function (book) {
     if (confirm(`Are you sure you want to delete "${book.title}"?`)) {
+      // Delete from MongoDB
+      $http.delete(`/api/books/${book.id}`)
+        .then(function(response) {
+          if (response.data.success) {
+            console.log('Book deleted from MongoDB');
+          }
+        })
+        .catch(function(error) {
+          console.error('Error deleting book from MongoDB:', error);
+        });
+      
+      // Update UI and localStorage (for backward compatibility)
       $scope.books = $scope.books.filter(b => b.id !== book.id);
       let storedBooks = JSON.parse(localStorage.getItem("books")) || [];
       storedBooks = storedBooks.filter(b => b.id !== book.id);
       localStorage.setItem("books", JSON.stringify(storedBooks));
+      
       alert("Book deleted successfully!");
 
       if (window.location.pathname.includes('viewBook.html') || 
@@ -160,10 +224,39 @@ app.controller("BookController", function ($scope, $window) {
       !$scope.newBook.author ||
       !$scope.newBook.price
     ) {
-      alert("All fields are required.");
+      alert("Title, author, and price are required.");
       return;
     }
 
+    // Handle file upload first if there's a file
+    if ($scope.coverImageFile) {
+      // Create FormData object for file upload
+      var formData = new FormData();
+      formData.append('coverImage', $scope.coverImageFile);
+      
+      // Upload the file first
+      $http.post('/api/upload', formData, {
+        transformRequest: angular.identity,
+        headers: {'Content-Type': undefined}
+      })
+      .then(function(response) {
+        if (response.data.success) {
+          // After successful upload, create the book with the image path
+          createBook(response.data.filePath);
+        }
+      })
+      .catch(function(error) {
+        console.error('Error uploading file:', error);
+        alert("Error uploading image. Please try again.");
+      });
+    } else {
+      // No file uploaded, use default image
+      createBook("images/9.jpg");
+    }
+  };
+  
+  // Helper function to create a book after image upload
+  function createBook(imagePath) {
     const newId = Math.max(...$scope.books.map(b => b.id)) + 1;
     const newBook = {
       id: newId,
@@ -173,9 +266,21 @@ app.controller("BookController", function ($scope, $window) {
       price: parseFloat($scope.newBook.price),
       originalPrice: parseFloat($scope.newBook.originalPrice || $scope.newBook.price),
       genre: $scope.newBook.genre || "Fiction",
-      coverImage: "images/9.jpg"
+      coverImage: imagePath
     };
 
+    // Save to MongoDB if we're using the API
+    $http.post('/api/books', newBook)
+      .then(function(response) {
+        if (response.data.success) {
+          console.log('Book saved to MongoDB:', response.data.book);
+        }
+      })
+      .catch(function(error) {
+        console.error('Error saving to MongoDB:', error);
+      });
+
+    // Also maintain localStorage for backward compatibility
     $scope.books.push(newBook);
     let storedBooks = JSON.parse(localStorage.getItem("books")) || [];
     storedBooks.push(newBook);
@@ -183,7 +288,7 @@ app.controller("BookController", function ($scope, $window) {
 
     alert("Book added successfully!");
     window.location.href = "/admin";
-  };
+  }
 
   $scope.editBook = function (book) {
     window.location.href = "/edit?id=" + book.id;
@@ -198,10 +303,31 @@ app.controller("BookController", function ($scope, $window) {
     const bookId = parseInt(urlParams.get('id'));
 
     if (bookId) {
-      const book = $scope.books.find(b => b.id === bookId);
-      if (book) {
-        $scope.book = book;
-      }
+      // Fetch the specific book from MongoDB
+      $http.get(`/api/books/${bookId}`)
+        .then(function(response) {
+          if (response.data.success) {
+            $scope.book = response.data.book;
+            console.log('Book details loaded from MongoDB:', $scope.book);
+          } else {
+            console.error('Book not found in MongoDB');
+            // Fallback to local books array if API fails
+            const book = $scope.books.find(b => b.id === bookId);
+            if (book) {
+              $scope.book = book;
+            } else {
+              console.error('Book not found in local array either');
+            }
+          }
+        })
+        .catch(function(error) {
+          console.error('Error fetching book details:', error);
+          // Fallback to local books array if API fails
+          const book = $scope.books.find(b => b.id === bookId);
+          if (book) {
+            $scope.book = book;
+          }
+        });
     }
   };
 
@@ -210,13 +336,35 @@ app.controller("BookController", function ($scope, $window) {
     const bookId = parseInt(urlParams.get('id'));
 
     if (bookId) {
-      const book = $scope.books.find(b => b.id === bookId);
-      if (book) {
-        $scope.book = book;
-      } else {
-        alert("Book not found!");
-        window.location.href = "/admin";
-      }
+      // Fetch the specific book from MongoDB for editing
+      $http.get(`/api/books/${bookId}`)
+        .then(function(response) {
+          if (response.data.success) {
+            $scope.book = response.data.book;
+            console.log('Book loaded for editing from MongoDB:', $scope.book);
+          } else {
+            console.error('Book not found in MongoDB');
+            // Fallback to local books array if API fails
+            const book = $scope.books.find(b => b.id === bookId);
+            if (book) {
+              $scope.book = book;
+            } else {
+              alert("Book not found!");
+              window.location.href = "/admin";
+            }
+          }
+        })
+        .catch(function(error) {
+          console.error('Error fetching book for editing:', error);
+          // Fallback to local books array if API fails
+          const book = $scope.books.find(b => b.id === bookId);
+          if (book) {
+            $scope.book = book;
+          } else {
+            alert("Book not found!");
+            window.location.href = "/admin";
+          }
+        });
     }
   };
 
@@ -232,6 +380,18 @@ app.controller("BookController", function ($scope, $window) {
       return;
     }
 
+    // Update in MongoDB
+    $http.put(`/api/books/${$scope.book.id}`, $scope.book)
+      .then(function(response) {
+        if (response.data.success) {
+          console.log('Book updated in MongoDB');
+        }
+      })
+      .catch(function(error) {
+        console.error('Error updating book in MongoDB:', error);
+      });
+
+    // Update in UI and localStorage (for backward compatibility)
     $scope.books[index] = $scope.book;
 
     let storedBooks = JSON.parse(localStorage.getItem("books")) || [];
@@ -240,7 +400,6 @@ app.controller("BookController", function ($scope, $window) {
     if (storedIndex !== -1) {
       storedBooks[storedIndex] = $scope.book;
     } else {
-
       storedBooks.push($scope.book);
     }
 
@@ -331,73 +490,89 @@ app.controller("CheckoutController", function ($scope) {
   };
 });
 
-app.controller("ViewBookController", function ($scope) {
+app.controller("ViewBookController", function ($scope, $http) {
   function getQueryParam(param) {
     let params = new URLSearchParams(window.location.search);
     return params.get(param);
   }
 
   const bookId = parseInt(getQueryParam("id"));
-  const storedBooks = JSON.parse(localStorage.getItem("books")) || [];
-  const allBooks = defaultBooks.concat(storedBooks);
-  $scope.book = allBooks.find((book) => book.id === bookId);
-
-  if (!$scope.book) {
-    window.location.href = "/html/admin/adminView.html";
-  }
+  
+  // Fetch the specific book from MongoDB
+  $http.get(`/api/books/${bookId}`)
+    .then(function(response) {
+      if (response.data.success) {
+        $scope.book = response.data.book;
+        console.log('Book loaded from MongoDB:', $scope.book);
+      } else {
+        console.error('Book not found in MongoDB');
+        // Fallback to localStorage if API fails
+        const storedBooks = JSON.parse(localStorage.getItem("books")) || [];
+        const allBooks = defaultBooks.concat(storedBooks);
+        $scope.book = allBooks.find((book) => book.id === bookId);
+      }
+      
+      if (!$scope.book) {
+        alert("Book not found!");
+        window.location.href = "/admin";
+      }
+    })
+    .catch(function(error) {
+      console.error('Error fetching book:', error);
+      // Fallback to localStorage if API fails
+      const storedBooks = JSON.parse(localStorage.getItem("books")) || [];
+      const allBooks = defaultBooks.concat(storedBooks);
+      $scope.book = allBooks.find((book) => book.id === bookId);
+      
+      if (!$scope.book) {
+        alert("Book not found!");
+        window.location.href = "/admin";
+      }
+    });
 });
 
-app.controller("AuthController", function ($scope, $window) {
+app.controller("AuthController", function ($scope, $window, $http) {
 
   $scope.loginData = { username: "", password: "" };
   $scope.signupData = { username: "", email: "", password: "", confirmPassword: "" };
 
   $scope.loginError = null;
   $scope.signupError = null;
-
-  const dummyUsers = [
-    { id: 1, username: "Kishan", password: "Kishan@123", role: "user" },
-    { id: 2, username: "Mansi", password: "Mansi@123", role: "user" },
-    { id: 3, username: "Shraddha", password: "Shraddha@123", role: "user" },
-    { id: 4, username: "admin", password: "admin", role: "admin" }
-  ];
-
   $scope.currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
   $scope.login = function() {
-
     if (!$scope.loginData.username || !$scope.loginData.password) {
       $scope.loginError = "Please fill in all fields";
       return;
     }
 
-    const user = dummyUsers.find(u => 
-      u.username === $scope.loginData.username && 
-      u.password === $scope.loginData.password
-    );
-
-    if (user) {
-
-      const userData = {
-        id: user.id,
-        username: user.username,
-        role: user.role
-      };
-
-      localStorage.setItem("currentUser", JSON.stringify(userData));
-
-      if (user.role === "admin") {
-        $window.location.href = "/admin";
-      } else {
-        $window.location.href = "/";
+    // Use the API endpoint for authentication
+    $http.post('/api/login', {
+      username: $scope.loginData.username,
+      password: $scope.loginData.password
+    })
+    .then(function(response) {
+      if (response.data.success) {
+        const userData = response.data.user;
+        
+        // Store user data in localStorage
+        localStorage.setItem("currentUser", JSON.stringify(userData));
+        
+        // Redirect based on role
+        if (userData.role === "admin") {
+          $window.location.href = "/admin";
+        } else {
+          $window.location.href = "/";
+        }
       }
-    } else {
+    })
+    .catch(function(error) {
+      console.error('Login error:', error);
       $scope.loginError = "Invalid username or password";
-    }
+    });
   };
 
   $scope.signup = function() {
-
     if (!$scope.signupData.username || !$scope.signupData.email || 
         !$scope.signupData.password || !$scope.signupData.confirmPassword) {
       $scope.signupError = "Please fill in all fields";
@@ -409,13 +584,26 @@ app.controller("AuthController", function ($scope, $window) {
       return;
     }
 
-    if (dummyUsers.some(u => u.username === $scope.signupData.username)) {
-      $scope.signupError = "Username already exists";
-      return;
-    }
-
-    alert("Account created successfully! Please login.");
-    $window.location.href = "/login";
+    // Use the API endpoint for user registration
+    $http.post('/api/register', {
+      username: $scope.signupData.username,
+      email: $scope.signupData.email,
+      password: $scope.signupData.password
+    })
+    .then(function(response) {
+      if (response.data.success) {
+        alert("Account created successfully! Please login.");
+        $window.location.href = "/login";
+      }
+    })
+    .catch(function(error) {
+      console.error('Registration error:', error);
+      if (error.status === 409) {
+        $scope.signupError = "Username already exists";
+      } else {
+        $scope.signupError = "Error creating account. Please try again.";
+      }
+    });
   };
 
   $scope.logout = function() {

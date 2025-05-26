@@ -333,7 +333,7 @@
                 <div class="col-lg-7">
                     <div class="carousel-container" id="bookCarousel">
                         <div class="carousel-books d-flex justify-content-end">
-                            <img ng-repeat="book in books | limitTo:5" src="{{book.coverImage}}" class="book-cover position-{{$index+1}}" alt="{{book.title}}" onerror="this.src='images/2.png'">
+                            <img ng-repeat="book in books | limitTo:5" ng-src="/{{book.coverImage}}" class="book-cover position-{{$index+1}}" alt="{{book.title}}" onerror="this.src='images/' + (($index % 6) + 1) + '.png'">
                         </div>
                     </div>
                 </div>
@@ -347,7 +347,7 @@
             <div class="col-md-4 mb-4" ng-repeat="book in books | limitTo:3:3">
                 <div class="book-card">
                     <div class="book-image">
-                        <img src="{{book.coverImage}}" alt="{{book.title}}">
+                        <img ng-src="/{{book.coverImage}}" alt="{{book.title}}" onerror="this.src='images/' + (($index % 6) + 1) + '.png'">
                     </div>
                     <div class="book-details">
                         <div>
