@@ -3,8 +3,7 @@ const app = express()
 const port = 5959
 const path = require('path')
 
-app.use(express.static('Component /Component_public'));
-
+app.use(express.static('Component_public'));
 app.use(express.static(path.join(__dirname)));
 
 app.use(express.json())
