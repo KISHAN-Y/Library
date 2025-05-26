@@ -72,7 +72,7 @@ Licensed under the **MIT License** 🛡 [Click here](LICENSE) for details.
 
 ## 🌐 Connect with Us  
 🔗 **GitHub Repository:** [Library Management System](https://github.com/KISHAN-Y/Library)  
-✉ **Contact:** [Your Email or Socials Here]  
+✉ **Contact:** kishanyadav2093@gmail.com  
 
 ---
 
