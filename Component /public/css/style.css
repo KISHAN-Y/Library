@@ -1,0 +1,107 @@
+
+        /* Global Styles */
+        body {
+            background-color: #f4f4f9;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(to right, #4a90e2, #9013fe);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-section h1 {
+            font-weight: bold;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Book Card Styling */
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-img {
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 2px solid #ddd;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .card-title {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Buttons Styling */
+        .btn {
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border: none;
+            color: #333;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 10px;
+            border-radius: 30px;
+            border: 1px solid #ddd;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        .cart-container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .cart-title {
+            text-align: center;
+            font-weight: bold;
+        }
+        .cart-summary {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: right;
+        }
+        .btn-remove {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }

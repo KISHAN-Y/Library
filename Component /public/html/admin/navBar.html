@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/admin">Bookstore Admin</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarAdmin">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/add">Add Book</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin">View All Books</a></li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3" ng-if="currentUser">
+                    Welcome, <strong>{{currentUser.username}}</strong> (Admin)
+                </span>
+                <a class="btn btn-outline-light" href="javascript:void(0)" ng-click="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

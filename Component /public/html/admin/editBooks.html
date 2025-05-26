@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="bookstoreApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Book - Bookstore</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .form-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .book-image-preview {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body ng-controller="AuthController">
+    <div ng-controller="BookController" ng-init="loadBookToUpdate()">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/admin">Bookstore Admin</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarAdmin">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" href="/add">Add Book</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/admin">View All Books</a></li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <span class="text-white me-3" ng-if="currentUser">
+                            Welcome, <strong>{{currentUser.username}}</strong> (Admin)
+                        </span>
+                        <a class="btn btn-outline-light" href="javascript:void(0)" ng-click="logout()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container mt-5 mb-5">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="form-card p-4">
+                        <h2 class="text-center mb-4"><i class="fas fa-edit text-success"></i> Update Book</h2>
+                        
+                        <div class="book-image-preview" ng-if="book">
+                            <img ng-src="/{{book.coverImage}}" alt="{{book.title}}" class="preview-image" onerror="this.src='/2.png'">
+                        </div>
+                        
+                        <form ng-submit="updateBook()" class="mx-auto">
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" ng-model="book.title" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Author</label>
+                                <input type="text" ng-model="book.author" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea ng-model="book.description" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Price ($)</label>
+                                    <input type="number" step="0.01" ng-model="book.price" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Original Price ($)</label>
+                                    <input type="number" step="0.01" ng-model="book.originalPrice" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Genre</label>
+                                <select ng-model="book.genre" class="form-control" required>
+                                    <option value="">-- Select Genre --</option>
+                                    <option value="Fiction">Fiction</option>
+                                    <option value="Non-Fiction">Non-Fiction</option>
+                                    <option value="Biography">Biography</option>
+                                    <option value="Mystery">Mystery</option>
+                                    <option value="Sci-Fi">Sci-Fi</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Cover Image</label>
+                                <select ng-model="book.coverImage" class="form-control">
+                                    <option value="images/The Time Has Come.jpeg">The Time Has Come</option>
+                                    <option value="images/I Want A Better Catastrophe .jpeg">I Want A Better Catastrophe</option>
+                                    <option value="images/My Government Means to Kill Me .jpeg">My Government Means to Kill Me</option>
+                                    <option value="images/The Last Thing He Told Me .jpeg">The Last Thing He Told Me</option>
+                                    <option value="images/Pride and Protest .jpeg">Pride and Protest</option>
+                                    <option value="images/Forget a Mentor, Find a Sponsor.jpeg">Forget a Mentor, Find a Sponsor</option>
+                                    <option value="images/The Midnight Library.jpeg">The Midnight Library</option>
+                                    <option value="images/Project Hail Mary.jpeg">Project Hail Mary</option>
+                                    <option value="images/The Invisible Life of Addie LaRue .jpeg">The Invisible Life of Addie LaRue</option>
+                                    <option value="images/Klara and the Sun.jpeg">Klara and the Sun</option>
+                                    <option value="images/9.jpg">Default Image</option>
+                                    <option value="images/1.png">Image 1</option>
+                                    <option value="images/2.png">Image 2</option>
+                                </select>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success"><i class="fas fa-save me-2"></i>Update Book</button>
+                                <a href="/admin" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/app.js"></script>
+</body>
+
+</html>

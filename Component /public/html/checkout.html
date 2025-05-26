@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="bookstoreApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="/js/app.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .checkout-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .checkout-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .order-summary {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .cart-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .total-row {
+            font-weight: bold;
+            border-top: 2px solid #ddd;
+            padding-top: 1rem;
+        }
+        .book-title {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body ng-controller="CheckoutController" ng-init="fetchUserInfo()">
+
+    <div class="container mt-5 mb-5 checkout-container">
+        <div class="checkout-header">
+            <h2 class="text-center"><i class="fas fa-shopping-cart me-2"></i>Checkout</h2>
+            <p class="text-center text-muted">Please review your order and complete the checkout process</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Shipping Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form ng-submit="placeOrder()">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" ng-model="order.name" required value="{{currentUser.username}}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" ng-model="order.email" required value="{{currentUser.username}}@example.com">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" ng-model="order.address" required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Payment Method</label>
+                                <select class="form-control" ng-model="order.paymentMethod" required>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="PayPal">PayPal</option>
+                                    <option value="Cash on Delivery">Cash on Delivery</option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check-circle me-2"></i>Place Order
+                                </button>
+                                <a href="/cartDetails" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="order-summary">
+                    <h5 class="mb-3">Order Summary</h5>
+                    
+                    <div ng-if="cart.length === 0" class="text-center p-4">
+                        <p>Your cart is empty.</p>
+                        <a href="/" class="btn btn-warning">Continue Shopping</a>
+                    </div>
+                    
+                    <div ng-if="cart.length > 0">
+                        <div class="cart-item" ng-repeat="item in cart">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <span class="book-title">{{item.title}}</span>
+                                    <div class="text-muted small">Qty: {{item.quantity}}</div>
+                                </div>
+                                <div>
+                                    <strong>${{(item.price * item.quantity).toFixed(2)}}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-3">
+                            <span>Subtotal</span>
+                            <span>${{getTotalPrice().toFixed(2)}}</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <span>Shipping</span>
+                            <span>$5.00</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between total-row mt-3 pt-2">
+                            <span>Total</span>
+                            <span>${{(getTotalPrice() + 5).toFixed(2)}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

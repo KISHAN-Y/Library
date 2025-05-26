@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="bookstoreApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Bookstore</title>
+    <link rel="icon" type="image/x-icon" href="/images/book1.jpg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+
+        .section-heading {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+        }
+
+        .book-container {
+            margin-bottom: 30px;
+        }
+
+        .book-card {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            width: 100%;
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+        }
+
+        .book-card:hover {
+            cursor: pointer;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(228, 164, 69, 0.463);
+        }
+
+        .book-image {
+            width: 30%;
+            flex-shrink: 0;
+        }
+
+        .book-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .book-details {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 70%;
+        }
+
+        .book-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .book-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .pricing {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .current-price {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-left: 10px;
+        }
+
+        .add-button {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .add-button:hover {
+            background-color: #f0c000;
+        }
+
+        .cart-icon {
+            margin-right: 8px;
+        }
+
+        .genre-dropdown {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 180px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .book-row {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .next-button {
+            background: white;
+            border: 1px solid #ddd;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            transform: translateY(-50%);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .prev-button {
+            background: white;
+            border: 1px solid #ddd;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 50%;
+            left: -20px;
+
+            transform: translateY(-50%);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .carousel-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .carousel-books {
+            position: relative;
+            width: 70%;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .book-cover {
+            position: absolute;
+            height: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 1s ease;
+            border-radius: 5px;
+        }
+
+        .position-1 {
+            transform: translateX(120px);
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        .position-2 {
+            transform: translateX(60px);
+            z-index: 2;
+            opacity: 0.85;
+
+        }
+
+        .position-3 {
+            transform: translateX(0);
+            z-index: 3;
+            opacity: 0.9;
+        }
+
+        .position-4 {
+            transform: translateX(-60px);
+            z-index: 4;
+            opacity: 0.95;
+        }
+
+        .position-5 {
+            transform: translateX(-120px);
+            z-index: 5;
+            opacity: 1
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .logo {
+            max-width: 100px;
+        }
+
+        .news-card {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(228, 164, 69, 0.463);
+        }
+
+        .news-img {
+            max-height: 120px;
+            object-fit: cover;
+        }
+        .view-all-button {
+            background-color: transparent;
+            color: #1a1a1a;
+            border: 2px solid #ffcc00;
+            padding: 10px 25px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+        .view-all-button:hover {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+        }
+
+        footer {
+            background-color: #f8f9fa;
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+
+<body ng-controller="BookController">
+<div ng-controller="AuthController">
+    <header class="bg-light">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container-fluid">
+                    <a href="/" class="navbar-brand d-flex align-items-center">
+                        <i class="fas fa-book-open text-warning me-2"></i>
+                        <span class="fw-bold">Bookstore</span>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="d-flex flex-grow-1">
+                        <form class="d-flex flex-grow-1 mx-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="search" class="form-control border-start-0"
+                                    placeholder="What are you looking for? " ng-model="searchQueryforIndex">
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <div ng-show="!currentUser" class="me-3">
+                            <a href="/login" class="nav-link">
+                                <i class="fas fa-user nav-icon"></i>
+                            </a>
+                        </div>
+                        <div ng-show="currentUser" class="me-3 text-dark">
+                            <span>Welcome, {{currentUser.username}}!</span>
+                            <a href="javascript:void(0)" ng-click="logout()" class="ms-2 text-danger">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                        <a href="#" class="nav-link me-3">
+                            <i class="fas fa-heart nav-icon"></i>
+                        </a>
+                        <a href="/cartDetails" class="btn btn-warning px-3">
+                            <i class="fas fa-shopping-cart me-1"></i> Basket
+                            <span class="badge bg-danger" ng-if="getCartCount() > 0">{{getCartCount()}}</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5 new-releases">
+                    <h1 class="section-heading">New Releases This Week</h1>
+                    <p>It's time to update your reading list with some of the latest and greatest releases in the
+                        literary world. From heart-pumping thrillers to captivating memoirs, this week's new releases
+                        offer something for everyone.</p>
+                    <button class="btn btn-warning px-4 py-2 mt-3">Subscribe</button>
+                </div>
+                <div class="col-lg-7">
+                    <div class="carousel-container" id="bookCarousel">
+                        <div class="carousel-books d-flex justify-content-end">
+                            <img ng-repeat="book in books | limitTo:5" src="{{book.coverImage}}" class="book-cover position-{{$index+1}}" alt="{{book.title}}" onerror="this.src='images/2.png'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container py-5">
+        <h2 class="section-heading">Best Picks for You: Today's Top-Selling Reads</h2>
+        <div class="row book-row">
+            <div class="col-md-4 mb-4" ng-repeat="book in books | limitTo:3:3">
+                <div class="book-card">
+                    <div class="book-image">
+                        <img src="{{book.coverImage}}" alt="{{book.title}}">
+                    </div>
+                    <div class="book-details">
+                        <div>
+                            <h3 class="book-title">{{book.title}}</h3>
+                            <p class="book-description">{{book.description}}</p>
+                        </div>
+                        <div>
+                            <div class="pricing">
+                                <span class="current-price">${{book.price}}</span>
+                                <span class="original-price">${{book.originalPrice}}</span>
+                            </div>
+                            <button class="add-button" ng-click="addToCart(book)">
+                                <i class="fas fa-shopping-cart cart-icon"></i>
+                                Add to basket
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4 mb-4">
+            <button class="view-all-button" onclick="window.location.href='/viewallbooks'">
+                View all books
+            </button>
+        </div>
+    </section>
+
+    <section class="container pb-5">
+        <h2 class="section-heading">News</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 ">
+            <div class="bg-white p-4 rounded-md shadow-md news-card">
+                <h3 class="text-lg font-bold">
+                    The Books You Need to Read in 2024
+                </h3>
+                <p class="text-gray-600">
+                    His is the blog we know you've all been waiting for. We present the top 10 titles for 2023 in
+                    fiction, non-fiction and children's books; a glorious mix of masterful storytelling, compelling
+                    subject matter and page-turning thrills...
+                </p>
+                <img alt="Collage of book covers" class="w-full mt-4" height="100"
+                    src="https://storage.googleapis.com/a1aa/image/Bqgbr6-EB05V7Ek7cGfABj7BNAs2xBV75WiA91_gAW4.jpg"
+                    width="150" />
+            </div>
+            <div class="bg-white p-4 rounded-md shadow-md news-card">
+                <h3 class="text-lg font-bold">
+                    February's Best Children's Books
+                </h3>
+                <p class="text-gray-600">
+                    Some of the finest children's authors currently writing have books publishing this month, from
+                    Natasha Farrant to Elle McNicoll and from Tashena Muir to Harriet Muncaster. Across all areas
+                    and age ranges there are plenty of fantastic titles...
+                </p>
+                <img alt="Collage of children's book covers" class="w-full mt-4" height="100"
+                    src="https://storage.googleapis.com/a1aa/image/ZzlLJlc4IpqU3pEQkDAFeNUlhx6DMAD4WgHl-iei34k.jpg"
+                    width="150" />
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-book-open text-warning me-2 fs-3"></i>
+                        <span class="fw-bold fs-4">Bookstore</span>
+                    </div>
+                    <p class="text-muted">Your one-stop destination for the best books across all genres.</p>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <h5 class="fw-bold mb-3">About</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Our Story</a></li>
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Team</a></li>
+                                <li><a href="#" class="text-decoration-none text-muted">Careers</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <h5 class="fw-bold mb-3">Support</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">FAQ</a></li>
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Contact Us</a></li>
+                                <li><a href="#" class="text-decoration-none text-muted">Shipping</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <h5 class="fw-bold mb-3">Legal</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Terms</a></li>
+                                <li class="mb-2"><a href="#" class="text-decoration-none text-muted">Privacy</a></li>
+                                <li><a href="#" class="text-decoration-none text-muted">Cookies</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <h5 class="fw-bold mb-3">Follow Us</h5>
+                            <div class="d-flex">
+                                <a href="#" class="text-decoration-none text-muted me-3"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="text-decoration-none text-muted me-3"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="text-decoration-none text-muted me-3"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="text-decoration-none text-muted"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-top pt-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <p class="mb-0 text-muted">&copy; 2025 Bookstore. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="d-flex justify-content-md-end justify-content-center">
+                            <a href="#" class="text-decoration-none text-muted me-4">Privacy Policy</a>
+                            <a href="#" class="text-decoration-none text-muted me-4">Terms of Use</a>
+                            <a href="#" class="text-decoration-none text-muted">Legal</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            function initializeCarousel() {
+                const carouselContainer = document.getElementById('bookCarousel');
+                if (!carouselContainer) {
+                    setTimeout(initializeCarousel, 500);
+                    return;
+                }
+
+                const books = carouselContainer.querySelectorAll('.book-cover');
+
+                if (books.length === 0) {
+                    console.log("Waiting for books to be rendered by Angular...");
+                    setTimeout(initializeCarousel, 500);
+                    return;
+                }
+
+                const totalPositions = books.length;
+                console.log("Carousel initialized with " + books.length + " books");
+
+                let loadedImages = 0;
+                books.forEach((book) => {
+
+                    const originalSrc = book.getAttribute('src');
+                    if (originalSrc === "{{book.coverImage}}") {
+
+                        console.log("Angular binding not complete yet, waiting...");
+                        setTimeout(initializeCarousel, 300);
+                        return;
+                    }
+
+                    if (book.complete && book.naturalHeight !== 0) {
+                        loadedImages++;
+                    } else {
+                        book.addEventListener('load', () => {
+                            loadedImages++;
+                            if (loadedImages === books.length) {
+                                setupCarousel();
+                            }
+                        });
+
+                        book.addEventListener('error', (e) => {
+                            console.log("Error loading image:", e.target.src);
+
+                            e.target.src = 'images/2.png';
+                            loadedImages++;
+                            if (loadedImages === books.length) {
+                                setupCarousel();
+                            }
+                        });
+                    }
+                });
+
+                if (loadedImages === books.length) {
+                    setupCarousel();
+                }
+
+                function setupCarousel() {
+                    books.forEach((book, index) => {
+                        for (let i = 1; i <= totalPositions; i++) {
+                            book.classList.remove(`position-${i}`);
+                        }
+                        book.classList.add(`position-${index + 1}`);
+                    });
+
+                    const carouselInterval = setInterval(shuffleCarousel, 3000);
+
+                    carouselContainer.addEventListener('click', function() {
+                        shuffleCarousel();
+                    });
+                }
+
+                function shuffleCarousel() {
+                    const currentPositions = [];
+
+                    books.forEach((book) => {
+                        for (let i = 1; i <= totalPositions; i++) {
+                            if (book.classList.contains(`position-${i}`)) {
+                                currentPositions.push(i);
+                                break;
+                            }
+                        }
+                    });
+
+                    const newPositions = currentPositions.map(pos =>
+                        pos === totalPositions ? 1 : pos + 1
+                    );
+
+                    books.forEach((book, index) => {
+                        for (let i = 1; i <= totalPositions; i++) {
+                            book.classList.remove(`position-${i}`);
+                        }
+                        book.classList.add(`position-${newPositions[index]}`);
+                    });
+                }
+            }
+
+            setTimeout(initializeCarousel, 500);
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script src="../js/app.js"></script>
+</div>
+</body>
+
+</html>
